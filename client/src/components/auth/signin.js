@@ -5,12 +5,11 @@ import * as actions from '../../actions';
 
 
 class Signin extends Component {
+  componentWillMount() {
+    this.props.clearError();
+  }
+  
   handleFormSubmit({email, password}) {
-    console.log(email, password);
-    // Need to do something to log user in
-    
-    console.log(this.props);
-    
     this.props.signinUser({email, password}, this.props.history);
   }
   
@@ -31,7 +30,7 @@ class Signin extends Component {
     if (this.props.errorMessage) {
       return (
         <div className="alert alert-danger">
-          <strong>Oops!</strong> {this.props.errorMessage}
+          <strong>Error!</strong> {this.props.errorMessage}
         </div>
       );
     }

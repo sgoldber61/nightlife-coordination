@@ -1,6 +1,6 @@
 const config = require('../config');
 const yelp = require('yelp-fusion');
-const client = yelp.client(config.yelpApiKey);
+const yelpClient = yelp.client(config.yelpApiKey);
 const _ = require('lodash');
 const Bar = require('../models/bar'); // Mongoose model
 
@@ -8,12 +8,12 @@ const Bar = require('../models/bar'); // Mongoose model
 // indicate that we are going to a bar
 exports.addBar = function(req, res, next) {
   // request body: bar's yelp id
-  const yelpId = req.body.yelpId;
-  console.log(req.user);
+  const id = req.body.id;
+  const index = req.body.index;
   const user_id = req.user._id; // authenticated user's object id
   
   // is user already at the bar?
-  Bar.findOne({yelpId, users: user_id}, function(err, bar) {
+  Bar.findOne({id, users: user_id}, function(err, bar) {
     if (err)
       return next(err);
     
@@ -24,11 +24,11 @@ exports.addBar = function(req, res, next) {
     }
     
     // if not, upsert the user to the bar array
-    Bar.findOneAndUpdate({yelpId}, {$push: {users: user_id}, $inc: {totalUsers: 1}}, {upsert: true, new: true}, function(err, bar) {
+    Bar.findOneAndUpdate({id}, {$push: {users: user_id}, $inc: {totalUsers: 1}}, {upsert: true, new: true}, function(err, bar) {
       if (err)
         return next(err);
       
-      return res.json({message: "User was added to bar.", totalUsers: bar.totalUsers});
+      return res.json({message: "User was added to bar.", updatedBar: {id: bar.id, totalUsers: bar.totalUsers, userGoingQ: true, __order: index}});
     });
   });
 };
@@ -37,11 +37,12 @@ exports.addBar = function(req, res, next) {
 // indicate that we are no longer going to a bar
 exports.removeBar = function(req, res, next) {
   // request body: bar's yelp id
-  const yelpId = req.body.yelpId;
+  const id = req.body.id;
+  const index = req.body.index;
   const user_id = req.user._id; // authenticated user's object id
   
   // find and remove user
-  Bar.findOneAndUpdate({yelpId, users: user_id}, {$pull: {users: user_id}, $inc: {totalUsers: -1}}, {new: true}, function(err, bar) {
+  Bar.findOneAndUpdate({id, users: user_id}, {$pull: {users: user_id}, $inc: {totalUsers: -1}}, {new: true}, function(err, bar) {
     if (err)
       return next(err);
     
@@ -58,7 +59,7 @@ exports.removeBar = function(req, res, next) {
       });
     }
     else {
-      return res.json({message: "User was removed from the bar.", totalUsers: bar.totalUsers});
+      return res.json({message: "User was removed from the bar.", updatedBar: {id: bar.id, totalUsers: bar.totalUsers, userGoingQ: false, __order: index}});
     }
   });
 };
@@ -72,9 +73,15 @@ exports.searchBars = function(req, res, next) {
   const user = req.user;
   
   // conduct search
-  client.search({location, categories}).then(function(response) {
+  if (!location)
+    return res.json({message: "Bars user data returned.", barSearchData: {}, userData: {}});
+  
+  yelpClient.search({location, categories}).then(function(response) {
     const businesses = _.take(response.jsonBody.businesses, 30);
-    const barSearchData = _.map(businesses, (element) => {return _.pick(element, ['id', 'name', 'url', 'rating', 'image_url']);});
+    
+    const barSearchData = _.map(businesses, (element) => {
+      return _.pick(element, ['id', 'name', 'url', 'rating', 'image_url']);
+    });
     
     const yelpIds = _.map(barSearchData, (element) => {return element.id;});
     const user_id = (user ? user._id : false);
@@ -94,7 +101,7 @@ exports.searchBars = function(req, res, next) {
 // get user data for the bars that have already been searched for
 exports.barsUserData = function(req, res, next) {
   // array of yelpIds
-  const yelpIds = JSON.parse(req.query.yelpIds); // req.query.yelpIds is a string that we parse into an array here
+  const yelpIds = JSON.parse(req.query.yelpIdString); // req.query.yelpIdString is a string that we parse into an array here
   const user_id = req.user._id; // authenticated user's object id
   
   barDataQuery(yelpIds, user_id).exec(function(err, userData) {
@@ -110,8 +117,8 @@ exports.barsUserData = function(req, res, next) {
 // this is for a logged in user if user_id is truthy, otherwise not logged in.
 // returns a mongoose query that we can later execute.
 function barDataQuery(yelpIds, user_id) {
-  const match = {$match: {yelpId: {$in: yelpIds}}};
-  const project = {$project: {yelpId: 1, totalUsers: 1, __order: {$indexOfArray : [yelpIds, "$yelpId"]}, userGoingQ: {$in: [user_id, "$users"]}}};
+  const match = {$match: {id: {$in: yelpIds}}};
+  const project = {$project: {id: 1, totalUsers: 1, __order: {$indexOfArray : [yelpIds, "$id"]}, userGoingQ: {$in: [user_id, "$users"]}}};
   const sort = {$sort : {__order : 1}};
   
   return Bar.aggregate([match, project, sort]);

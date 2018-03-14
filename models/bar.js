@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 // Define our mongoose model
 const barSchema = new Schema({
-  yelpId: String, // yelpId denotes the particular bar
+  id: String, // id denotes the particular bar
   totalUsers: Number, // how many users are going
   users: [Schema.Types.ObjectId] // user _ids
 });

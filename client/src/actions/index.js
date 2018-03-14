@@ -1,5 +1,6 @@
 import axios from 'axios';
-import {AUTH_USER, DEAUTH_USER, AUTH_ERROR, FETCH_MESSAGE} from './types';
+import _ from 'lodash';
+import * as types from './types';
 
 const ROOT_URL = 'http://localhost:3090';
 
@@ -12,13 +13,13 @@ export function signinUser({email, password}, history) {
         // If request is good...
         
         // - Update state to indicate user is authenticated
-        dispatch({type: AUTH_USER});
+        dispatch({type: types.AUTH_USER});
         
         // - Save the JWT token
         localStorage.setItem('token', response.data.token);
         
-        // - redirect to the route '/feature'
-        history.push('/feature');
+        // - redirect to the route '/'
+        history.push('/');
       })
       .catch(() => {
         // If request is bad...
@@ -34,9 +35,9 @@ export function signupUser({email, password}, history) {
   return function(dispatch) {
     axios.post(`${ROOT_URL}/signup`, {email, password})
       .then(response => {
-        dispatch({type: AUTH_USER});
+        dispatch({type: types.AUTH_USER});
         localStorage.setItem('token', response.data.token);
-        history.push('/feature');
+        history.push('/');
       })
       .catch(error => {
         dispatch(authError(error.message));
@@ -47,7 +48,7 @@ export function signupUser({email, password}, history) {
 
 export function authError(error) {
   return {
-    type: AUTH_ERROR,
+    type: types.AUTH_ERROR,
     payload: error
   };
 }
@@ -57,22 +58,97 @@ export function signoutUser() {
   localStorage.removeItem('token');
   
   return {
-    type: DEAUTH_USER,
+    type: types.DEAUTH_USER
   };
 }
 
 
-export function fetchMessage() {
+export function clearError() {
+  return {
+    type: types.CLEAR_ERROR
+  };
+}
+
+
+export function searchBars(location) {
   return function(dispatch) {
-    axios.get(ROOT_URL, {
+    axios.get(`${ROOT_URL}/search-bars`, {
+      headers: {authorization: localStorage.getItem('token')}, // if this token is blank, then request is unauthenticated
+      params: {location}
+    })
+      .then(response => {
+        dispatch({
+          type: types.SEARCH_BARS,
+          payload: _.pick(response.data, ['barSearchData', 'userData'])
+        });
+      })
+      .catch(error => {
+        dispatch(dataError(error.message));
+      })
+  }
+}
+
+
+export function getUserData(yelpIdString) {
+  return function(dispatch) {
+    axios.get(`${ROOT_URL}/bars-user-data`, {
+      headers: {authorization: localStorage.getItem('token')},
+      params: {yelpIdString}
+    })
+      .then(response => {
+        dispatch({
+          type: types.GET_USER_DATA,
+          payload: response.data.userData
+        });
+      })
+      .catch(error => {
+        dispatch(authError(error.message));
+      });
+  }
+}
+
+
+export function addBar(id, index) {
+  return function(dispatch) {
+    axios.post(`${ROOT_URL}/add-bar`, {id, index}, {
       headers: {authorization: localStorage.getItem('token')}
     })
       .then(response => {
         dispatch({
-          type: FETCH_MESSAGE,
-          payload: response.data.message
+          type: types.ADD_BAR,
+          payload: {updatedBar: response.data.updatedBar, id}
         });
+      })
+      .catch(error => {
+        dispatch(authError(error.message));
       });
   }
 }
+
+
+export function removeBar(id, index) {
+  return function(dispatch) {
+    axios.post(`${ROOT_URL}/remove-bar`, {id, index}, {
+      headers: {authorization: localStorage.getItem('token')}
+    })
+      .then(response => {
+        dispatch({
+          type: types.REMOVE_BAR,
+          payload: {updatedBar: response.data.updatedBar, id, index}
+        });
+      })
+      .catch(error => {
+        dispatch(authError(error.message));
+      });
+  }
+}
+
+
+export function dataError(error) {
+  return {
+    type: types.DATA_ERROR,
+    payload: error
+  };
+}
+
 
