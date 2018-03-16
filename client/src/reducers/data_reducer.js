@@ -6,7 +6,7 @@ export default function(state = {error: '', barSearchData: {}, userData: {}}, ac
     case types.SEARCH_BARS:
       return {...state, error: '', barSearchData: action.payload.barSearchData, userData: _.mapKeys(action.payload.userData, 'id')}; // action.payload contains barSearchData and userData.
     case types.GET_USER_DATA:
-      return {...state, error: '', userData: _.mapKeys(action.payload.userData, 'id')}; // action.payload is the userData. We will maintain the barSearchData.
+      return {...state, error: '', userData: _.mapKeys(action.payload, 'id')}; // action.payload is the userData. We will maintain the barSearchData.
     case types.DEAUTH_USER:
       return {...state, error: '', userData: {}}; // get rid of userData when user logs out.
     case types.ADD_BAR: {

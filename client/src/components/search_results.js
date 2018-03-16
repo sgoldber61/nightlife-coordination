@@ -1,19 +1,21 @@
 import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import _ from 'lodash';
 import SearchResult from './search_result';
 import * as actions from '../actions';
 
 class SearchResults extends Component {
+  static contextTypes = {
+    router: PropTypes.object
+  }
+  
   componentDidMount() {
-    // only attempt to get user data if we are logged in
-    if (localStorage.getItem('token')) {
-      // process redux barSearchData into yelpIdString
-      const yelpIds = _.map(this.props.barSearchData, (element) => {return element.id;});
-      const yelpIdString = JSON.stringify(yelpIds);
-      
-      this.props.getUserData(yelpIdString);
-    }
+    // process redux barSearchData into yelpIdString
+    const yelpIds = _.map(this.props.barSearchData, (element) => {return element.id;});
+    const yelpIdString = JSON.stringify(yelpIds);
+    
+    this.props.getUserData(yelpIdString);
   }
   
   processData(barSearchData, userData) {
@@ -33,7 +35,7 @@ class SearchResults extends Component {
     const results = _.map(searchUserData, (data, index) => {
       data.addBar = this.props.addBar;
       data.removeBar = this.props.removeBar;
-      return <SearchResult {...data} index={index} key={data.id} />
+      return <SearchResult {...data} index={index} authenticated={this.props.authenticated} history={this.context.router.history} key={data.id} />
     });
     
     return (
@@ -48,7 +50,7 @@ class SearchResults extends Component {
 
 
 function mapStateToProps(state) {
-  return {barSearchData: state.data.barSearchData, userData: state.data.userData};
+  return {barSearchData: state.data.barSearchData, userData: state.data.userData, authenticated: state.auth.authenticated};
 }
 
 

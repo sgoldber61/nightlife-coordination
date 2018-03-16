@@ -92,7 +92,7 @@ export function searchBars(location) {
 export function getUserData(yelpIdString) {
   return function(dispatch) {
     axios.get(`${ROOT_URL}/bars-user-data`, {
-      headers: {authorization: localStorage.getItem('token')},
+      headers: {authorization: localStorage.getItem('token')}, // if this token is blank, then request is unauthenticated
       params: {yelpIdString}
     })
       .then(response => {
@@ -108,7 +108,13 @@ export function getUserData(yelpIdString) {
 }
 
 
-export function addBar(id, index) {
+export function addBar({id, index}, history, authenticated) {
+  if (!authenticated) {
+    // if not logged in, then redirect to the route '/signin'
+    history.push('/signin');
+    return {type: types.REDIRECT_LOGIN};
+  }
+  
   return function(dispatch) {
     axios.post(`${ROOT_URL}/add-bar`, {id, index}, {
       headers: {authorization: localStorage.getItem('token')}
@@ -126,7 +132,13 @@ export function addBar(id, index) {
 }
 
 
-export function removeBar(id, index) {
+export function removeBar({id, index}, history, authenticated) {
+  if (!authenticated) {
+    // if not logged in, then redirect to the route '/signin'
+    history.push('/signin');
+    return {type: types.REDIRECT_LOGIN};
+  }
+  
   return function(dispatch) {
     axios.post(`${ROOT_URL}/remove-bar`, {id, index}, {
       headers: {authorization: localStorage.getItem('token')}

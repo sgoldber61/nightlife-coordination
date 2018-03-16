@@ -2,16 +2,17 @@ import React from 'react';
 
 function handleClick(props) {
   if (props.userGoingQ) {
-    props.removeBar(props.id, props.index);
+    props.removeBar({id: props.id, index: props.index}, props.history, props.authenticated);
   }
   else {
-    props.addBar(props.id, props.index);
+    props.addBar({id: props.id, index: props.index}, props.history, props.authenticated);
   }
 }
 
 export default (props) => {
   // props contains id, name, url, rating, image_url, and possibly totalUsers and userGoingQ
-  // props contains addBar, removeBar
+  // addBar, removeBar
+  // history, authenticated
   
   const totalGoing = (props.totalUsers ? props.totalUsers : 0);
   

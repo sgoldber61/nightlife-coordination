@@ -7,4 +7,5 @@ export const GET_USER_DATA = 'get_user_data';
 export const ADD_BAR = 'add_bar';
 export const REMOVE_BAR = 'remove_bar';
 export const DATA_ERROR = 'data_error';
+export const REDIRECT_LOGIN = 'redirect_login';
 

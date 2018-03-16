@@ -3,7 +3,7 @@ import {reduxForm, Field} from 'redux-form';
 import {connect} from 'react-redux';
 import * as actions from '../actions';
 
-
+// to do: destroy on unmount
 class SearchBar extends Component {
   handleFormSubmit({location}) {
     this.props.searchBars(location);

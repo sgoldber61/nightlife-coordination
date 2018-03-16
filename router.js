@@ -26,6 +26,6 @@ module.exports = function(app) {
   app.post('/add-bar', requireAuth, APIOperations.addBar); // indicate that we are going to a bar
   app.post('/remove-bar', requireAuth, APIOperations.removeBar); // indicate that we are no longer going to a bar
   app.get('/search-bars', optionalAuth, APIOperations.searchBars); // search for bars, with optional authentication
-  app.get('/bars-user-data', requireAuth, APIOperations.barsUserData); // get user data for the bars that have already been searched for
+  app.get('/bars-user-data', optionalAuth, APIOperations.barsUserData); // get user data for the bars that have already been searched for, with optional authentication
 }
 

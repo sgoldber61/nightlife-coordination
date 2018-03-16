@@ -102,7 +102,7 @@ exports.searchBars = function(req, res, next) {
 exports.barsUserData = function(req, res, next) {
   // array of yelpIds
   const yelpIds = JSON.parse(req.query.yelpIdString); // req.query.yelpIdString is a string that we parse into an array here
-  const user_id = req.user._id; // authenticated user's object id
+  const user_id = (req.user ? req.user._id : false);
   
   barDataQuery(yelpIds, user_id).exec(function(err, userData) {
     if (err)
