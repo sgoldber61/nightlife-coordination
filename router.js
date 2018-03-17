@@ -4,6 +4,8 @@ const APIOperations = require('./controllers/operations');
 const passportService = require('./services/passport');
 const passport = require('passport');
 
+const express = require('express');
+
 const requireAuth = passport.authenticate('jwt', {session: false});
 const requireSignin = passport.authenticate('local', {session: false});
 const optionalAuth = function(req, res, next) {
