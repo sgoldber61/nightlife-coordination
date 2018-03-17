@@ -2,3 +2,14 @@
   color: red;
 }
 
+body {
+  background-color: darkgray;
+}
+
+input {
+  background-color: lightgray !important;
+}
+
+.list-group-item {
+  background-color: lightgray !important;
+}

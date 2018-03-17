@@ -107,6 +107,12 @@ export function getUserData(yelpIdString) {
   }
 }
 
+export function clearSearch() {
+  return {
+    type: types.CLEAR_SEARCH
+  };
+}
+
 
 export function addBar({id, index}, history, authenticated) {
   if (!authenticated) {

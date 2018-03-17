@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
+const height = 25;
+const width = 45;
 
 class Header extends Component {
   renderLinks() {
@@ -33,6 +35,7 @@ class Header extends Component {
         <ul className="nav navbar-nav">
           {this.renderLinks()}
         </ul>
+        <div style={{float: "right"}}>Powered by <img src='https://d1tbpd1hx2blcp.cloudfront.net/images/articles/updates/yelp-logo.png' alt='' height={height} width={width} /></div>
       </nav>
     );
   }

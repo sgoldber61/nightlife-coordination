@@ -80,7 +80,7 @@ exports.searchBars = function(req, res, next) {
     const businesses = _.take(response.jsonBody.businesses, 30);
     
     const barSearchData = _.map(businesses, (element) => {
-      return _.pick(element, ['id', 'name', 'url', 'rating', 'image_url']);
+      return _.pick(element, ['id', 'name', 'url', 'image_url']);
     });
     
     const yelpIds = _.map(barSearchData, (element) => {return element.id;});
