@@ -1,6 +1,5 @@
-const config = require('../config');
 const yelp = require('yelp-fusion');
-const yelpClient = yelp.client(config.yelpApiKey);
+const yelpClient = yelp.client(process.env.yelpApiKey);
 const _ = require('lodash');
 const Bar = require('../models/bar'); // Mongoose model
 

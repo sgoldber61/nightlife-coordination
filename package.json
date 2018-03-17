@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "npm install --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client": "cd client && npm start",
+    "client": "cd client && npm run build",
     "server": "nodemon index.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "prod": "node index.js",
+    "web": "npm run client && npm run prod",
+    "start": "npm run web"
   },
   "author": "sgoldber61",
   "license": "ISC",

@@ -2,7 +2,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import * as types from './types';
 
-const ROOT_URL = 'http://localhost:3090';
+const ROOT_URL = process.env.REACT_APP_appUrl || 'http://localhost:3090';
 
 export function signinUser({email, password}, history) {
   // redux-thunk allows us to return a function from our action creator

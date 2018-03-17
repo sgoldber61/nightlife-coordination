@@ -10,7 +10,7 @@ const cors = require('cors');
 
 
 // DB Setup
-mongoose.connect('mongodb://localhost:27017/nightlife');
+mongoose.connect(process.env.mongodbUrl);
 
 
 // App setup
